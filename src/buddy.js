@@ -85,10 +85,16 @@ export class Buddy {
     this.targetOffsetY = bounce(this.time, movement.bounce * 0.5, movement.speed * 0.3);
     this.targetOffsetX = (movement.tiltX || 0) * 0.5 + smoothNoise(this.time * 0.1) * 0.1;
     
-    // Smooth lerp toward target (easing factor controls speed)
-    const lerpFactor = 0.08; // Lower = smoother/slower movement
-    this.offsetX = this.offsetX + (this.targetOffsetX - this.offsetX) * lerpFactor;
-    this.offsetY = this.offsetY + (this.targetOffsetY - this.offsetY) * lerpFactor;
+    // Smooth lerp toward target using smaller steps for smoother movement
+    const lerpFactor = 0.03; // Smaller factor = smoother, more gradual movement
+    const maxStep = 0.02; // Maximum step size per frame for extra smoothness
+    
+    // Calculate delta and clamp to max step for smoother motion
+    const deltaX = (this.targetOffsetX - this.offsetX) * lerpFactor;
+    const deltaY = (this.targetOffsetY - this.offsetY) * lerpFactor;
+    
+    this.offsetX += Math.max(-maxStep, Math.min(maxStep, deltaX));
+    this.offsetY += Math.max(-maxStep, Math.min(maxStep, deltaY));
   }
   
   updateExpressionTransition() {
@@ -213,14 +219,12 @@ export class Buddy {
       effectiveOpenness *= blinkFactor;
     }
     
-    // Determine eye character based on openness
+    // Determine eye character based on openness (only open or closed)
     let eyeChar;
-    if (effectiveOpenness < 0.3) {
+    if (effectiveOpenness < 0.5) {
       eyeChar = FACE_CHARS.eyeClosed;
-    } else if (effectiveOpenness < 0.7 || squint > 0.2) {
-      eyeChar = FACE_CHARS.eyeHalf;
     } else {
-      eyeChar = FACE_CHARS.eyeOpen;
+      eyeChar = ' '; // Open eye is just empty space inside parentheses
     }
     
     // Eye color (CRT amber)

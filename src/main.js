@@ -30,8 +30,7 @@ t.draw(() => {
   buddy.update(t.frameCount);
   buddy.draw(t);
   
-  // Apply CRT-like effects
-  t.filter('blur', { amount: 0.3 });
+
 });
 
 t.windowResized(() => {
