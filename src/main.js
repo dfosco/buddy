@@ -4,10 +4,7 @@
  */
 
 import { textmode } from 'textmode.js';
-import { Buddy } from './buddy.js';
-
-// CRT orange/amber background
-const BG_COLOR = [25, 12, 5]; // Dark warm orange
+import { Buddy, BG_COLOR } from './buddy.js';
 
 // Create textmode instance with larger font
 const t = textmode.create({
@@ -23,6 +20,10 @@ t.setup(() => {
   buddy = new Buddy(t);
   console.log('🤖 Buddy is alive! Try: buddy.triggerExpression("happy")');
   window.buddy = buddy;
+  
+  // Hide loading screen
+  const loading = document.getElementById('loading');
+  if (loading) loading.classList.add('hidden');
 });
 
 t.draw(() => {

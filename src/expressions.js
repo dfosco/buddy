@@ -87,6 +87,27 @@ export const expressions = {
     }
   },
 
+  sleeping: {
+    name: 'sleeping',
+    duration: Infinity,
+    eyes: {
+      openness: 0,
+      lookX: 0,
+      lookY: 0,
+      squint: 0,
+    },
+    mouth: {
+      smile: 0.2,
+      openness: 0,
+      width: 0.9,
+    },
+    movement: {
+      bounce: 0.1,
+      speed: 0.3,
+      driftY: 0.02,
+    }
+  },
+
   excited: {
     name: 'excited',
     duration: 2000,

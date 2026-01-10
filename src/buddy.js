@@ -6,14 +6,38 @@
 import { expressions, getRandomExpression } from './expressions.js';
 import { lerpExpression, bounce, smoothNoise, easing } from './animations.js';
 
+// Convert HSL to RGB
+function hslToRgb(h, s, l) {
+  s /= 100;
+  l /= 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => {
+    const k = (n + h / 30) % 12;
+    return l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+  };
+  return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+}
+
+// Random hue on each page load (0-360)
+const HUE = Math.floor(Math.random() * 360);
+
+// CRT character color and background using HSL with random hue
+const CHAR_COLOR = hslToRgb(HUE, 80, 70);
+export const BG_COLOR = hslToRgb(HUE, 70, 6);
+
 // CRT amber/orange character color (less contrasting)
-const CHAR_COLOR = [255, 180, 100];
-const BG_COLOR = [25, 12, 5];
+// const CHAR_COLOR = [255, 180, 100];
+// const BG_COLOR = [25, 12, 5];
+
+// Set CSS variables for loading screen and dot grid
+document.documentElement.style.setProperty('--char-color', `rgb(${CHAR_COLOR.join(',')})`);
+document.documentElement.style.setProperty('--char-color-faint', `rgba(${CHAR_COLOR.join(',')}, 0.1)`);
+document.documentElement.style.setProperty('--bg-color', `rgb(${BG_COLOR.join(',')})`);
 
 // ASCII art patterns for face elements
 const FACE_CHARS = {
   eyeOpen: 'O',
-  eyeClosed: '-',
+  eyeClosed: '‿',
   eyeHalf: 'o',
   pupil: '●',
   pupilSmall: '•',
@@ -27,6 +51,12 @@ const FACE_CHARS = {
 };
 
 export class Buddy {
+  // Time in seconds before Buddy falls asleep (adjustable)
+  static SLEEP_TIMEOUT = 120;
+  
+  // Duration of one zzz cycle in milliseconds (adjustable)
+  static ZZZ_CYCLE_DURATION = 2400;
+  
   constructor(t) {
     this.t = t;
     
@@ -55,6 +85,41 @@ export class Buddy {
     // Target position (calculated from bounce/noise)
     this.targetOffsetX = 0;
     this.targetOffsetY = 0;
+    
+    // Sleep state
+    this.isSleeping = false;
+    this.lastActivityTime = Date.now();
+    this.zzzStartTime = 0;
+    
+    // Set up mouse activity listener
+    this.setupActivityListener();
+  }
+  
+  setupActivityListener() {
+    const resetActivity = () => {
+      this.lastActivityTime = Date.now();
+      if (this.isSleeping) {
+        this.wakeUp();
+      }
+    };
+    
+    window.addEventListener('mousemove', resetActivity);
+    window.addEventListener('mousedown', resetActivity);
+    window.addEventListener('keydown', resetActivity);
+  }
+  
+  wakeUp() {
+    this.isSleeping = false;
+    this.setExpression(expressions.surprised);
+    this.expressionTimer = 0;
+    this.nextExpressionTime = expressions.surprised.duration / 16.67;
+    this.isInNeutral = false;
+  }
+  
+  fallAsleep() {
+    this.isSleeping = true;
+    this.zzzStartTime = Date.now();
+    this.setExpression(expressions.sleeping);
   }
   
   getRandomInterval() {
@@ -68,14 +133,24 @@ export class Buddy {
   update(frameCount) {
     this.time = frameCount / 60;
     
+    // Check for sleep timeout
+    const timeSinceActivity = (Date.now() - this.lastActivityTime) / 1000;
+    if (!this.isSleeping && timeSinceActivity >= Buddy.SLEEP_TIMEOUT) {
+      this.fallAsleep();
+    }
+    
     // Update expression transition
     this.updateExpressionTransition();
     
-    // Update expression timer
-    this.updateExpressionTimer();
+    // Update expression timer (skip if sleeping)
+    if (!this.isSleeping) {
+      this.updateExpressionTimer();
+    }
     
-    // Update blink
-    this.updateBlink();
+    // Update blink (skip if sleeping)
+    if (!this.isSleeping) {
+      this.updateBlink();
+    }
     
     // Get current interpolated state
     const state = this.getCurrentState();
@@ -202,6 +277,38 @@ export class Buddy {
     if (eyes.sparkle) {
       this.drawSparkles(t, posX, posY);
     }
+    
+    // Draw zzz if sleeping
+    if (this.isSleeping) {
+      this.drawZzz(t, posX, posY);
+    }
+  }
+  
+  drawZzz(t, centerX, centerY) {
+    const zzzChars = ['z', 'z', 'Z'];
+    const baseX = centerX + 6;
+    const baseY = centerY - 3;
+    
+    // Calculate phase from elapsed time and cycle duration
+    const elapsed = Date.now() - this.zzzStartTime;
+    const cycleProgress = (elapsed % Buddy.ZZZ_CYCLE_DURATION) / Buddy.ZZZ_CYCLE_DURATION;
+    
+    zzzChars.forEach((char, i) => {
+      // Each z floats up and fades in sequence (staggered by 1/3 of cycle)
+      const delay = i * (1/3);
+      const phase = (cycleProgress - delay + 1) % 1;
+      
+      // Visible for 80% of its cycle
+      if (phase < 0.8) {
+        const progress = phase / 0.8;
+        const floatY = baseY - (i * 1.5) - (progress * 2);
+        const floatX = baseX + (i * 1.2);
+        const alpha = Math.sin(progress * Math.PI) * 255;
+        
+        t.charColor(CHAR_COLOR[0], CHAR_COLOR[1], CHAR_COLOR[2], Math.floor(alpha));
+        this.drawCharAt(t, char, floatX, floatY);
+      }
+    });
   }
   
   drawEye(t, x, y, eyeState, side) {

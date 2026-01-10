@@ -1,22 +1,29 @@
 #!/bin/bash
 #
 # Buddy Kiosk Launcher
-# Starts Vite dev server and launches Chrome in kiosk-like app mode
+# Launches Chrome in kiosk-like app mode with the built version
 #
 
 set -e
 
-# Configuration
-PORT=5173
-URL="http://localhost:$PORT"
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+DIST_DIR="$PROJECT_DIR/dist"
+INDEX_FILE="$DIST_DIR/index.html"
 
 # Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}🤖 Starting Buddy...${NC}"
+
+# Check if build exists, if not build it
+if [ ! -f "$INDEX_FILE" ]; then
+    echo -e "${YELLOW}Build not found. Building...${NC}"
+    cd "$PROJECT_DIR"
+    npm run build
+fi
 
 # Check if Chrome is available
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -28,51 +35,17 @@ else
 fi
 
 if [ ! -f "$CHROME_PATH" ] && [ -z "$CHROME_PATH" ]; then
-    echo "Chrome not found. Please install Google Chrome."
+    echo -e "${RED}Chrome not found. Please install Google Chrome.${NC}"
     exit 1
 fi
 
-# Change to project directory
-cd "$PROJECT_DIR"
-
-# Function to cleanup on exit
-cleanup() {
-    echo -e "\n${YELLOW}Shutting down Buddy...${NC}"
-    if [ ! -z "$VITE_PID" ]; then
-        kill $VITE_PID 2>/dev/null || true
-    fi
-    exit 0
-}
-
-trap cleanup SIGINT SIGTERM
-
-# Start Vite dev server in background
-echo "Starting Vite dev server..."
-npm run dev -- --port $PORT &
-VITE_PID=$!
-
-# Wait for server to be ready
-echo "Waiting for server to start..."
-for i in {1..30}; do
-    if curl -s "$URL" > /dev/null 2>&1; then
-        echo -e "${GREEN}Server ready!${NC}"
-        break
-    fi
-    sleep 0.5
-done
-
-# Small delay to ensure everything is loaded
-sleep 1
-
-# Launch Chrome in app mode (kiosk-like without full kiosk lock)
+# Launch Chrome in app mode with local file
 echo -e "${GREEN}Launching Chrome in app mode...${NC}"
 echo -e "${YELLOW}Press Cmd+Shift+F (Mac) or F11 (Windows/Linux) for fullscreen${NC}"
-echo -e "${YELLOW}Press Ctrl+C in this terminal to stop Buddy${NC}"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS - use open command for better handling
     "$CHROME_PATH" \
-        --app="$URL" \
+        --app="file://$INDEX_FILE" \
         --window-size=1920,1080 \
         --disable-extensions \
         --disable-plugins \
@@ -83,11 +56,11 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         --disable-background-networking \
         --disable-infobars \
         --autoplay-policy=no-user-gesture-required \
+        --allow-file-access-from-files \
         2>/dev/null &
 else
-    # Linux/Windows
     "$CHROME_PATH" \
-        --app="$URL" \
+        --app="file://$INDEX_FILE" \
         --start-maximized \
         --disable-extensions \
         --disable-plugins \
@@ -98,8 +71,8 @@ else
         --disable-background-networking \
         --disable-infobars \
         --autoplay-policy=no-user-gesture-required \
+        --allow-file-access-from-files \
         2>/dev/null &
 fi
 
-# Wait for Vite process (keeps script running)
-wait $VITE_PID
+echo -e "${GREEN}Buddy launched!${NC}"
