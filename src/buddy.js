@@ -48,9 +48,13 @@ export class Buddy {
     this.isBlinking = false;
     this.blinkProgress = 0;
     
-    // Position offset for bounce
+    // Position offset for bounce (current smoothed position)
     this.offsetX = 0;
     this.offsetY = 0;
+    
+    // Target position (calculated from bounce/noise)
+    this.targetOffsetX = 0;
+    this.targetOffsetY = 0;
   }
   
   getRandomInterval() {
@@ -76,10 +80,15 @@ export class Buddy {
     // Get current interpolated state
     const state = this.getCurrentState();
     
-    // Update position offsets (smaller values for smoother movement)
+    // Calculate target position based on expression
     const { movement } = state;
-    this.offsetY = bounce(this.time, movement.bounce * 0.8, movement.speed * 0.7);
-    this.offsetX = (movement.tiltX || 0) * 1.5 + smoothNoise(this.time * 0.3) * 0.3;
+    this.targetOffsetY = bounce(this.time, movement.bounce * 0.5, movement.speed * 0.3);
+    this.targetOffsetX = (movement.tiltX || 0) * 0.5 + smoothNoise(this.time * 0.1) * 0.1;
+    
+    // Smooth lerp toward target (easing factor controls speed)
+    const lerpFactor = 0.08; // Lower = smoother/slower movement
+    this.offsetX = this.offsetX + (this.targetOffsetX - this.offsetX) * lerpFactor;
+    this.offsetY = this.offsetY + (this.targetOffsetY - this.offsetY) * lerpFactor;
   }
   
   updateExpressionTransition() {
@@ -143,42 +152,49 @@ export class Buddy {
     );
   }
   
-  // Helper to draw a single character at grid position
-  drawChar(t, char, x, y) {
+  // Helper to draw a single character at position (0,0 = center of screen)
+  drawCharAt(t, char, x, y) {
     t.push();
-    t.translate(x, y);
+    t.translate(Math.round(x), Math.round(y));
     t.char(char);
-    t.cellColor(BG_COLOR[0], BG_COLOR[1], BG_COLOR[2]); // Match background
+    t.charColor(CHAR_COLOR[0], CHAR_COLOR[1], CHAR_COLOR[2]);
+    t.cellColor(BG_COLOR[0], BG_COLOR[1], BG_COLOR[2]);
     t.point();
     t.pop();
   }
   
   draw(t) {
+    // Guard against grid not being ready
+    if (!t.grid || !t.grid.cols || !t.grid.rows) {
+      return;
+    }
+    
     const state = this.getCurrentState();
     const { eyes, mouth: mouthState } = state;
     
-    // Face is centered, offsets are relative to center
-    const offsetX = this.offsetX;
-    const offsetY = this.offsetY;
+    // textmode.js coordinate system is centered at (0,0)
+    // So we just use our small offsets directly
+    const posX = this.offsetX;
+    const posY = this.offsetY;
     
     // Eye spacing
     const eyeSpacing = 4;
     
     // Draw eyes
-    this.drawEye(t, -eyeSpacing + offsetX, -2 + offsetY, eyes, -1);
-    this.drawEye(t, eyeSpacing + offsetX, -2 + offsetY, eyes, 1);
+    this.drawEye(t, -eyeSpacing + posX, -2 + posY, eyes, -1);
+    this.drawEye(t, eyeSpacing + posX, -2 + posY, eyes, 1);
     
     // Draw mouth
-    this.drawMouth(t, offsetX, 2 + offsetY, mouthState);
+    this.drawMouth(t, posX, 2 + posY, mouthState);
     
     // Draw blush if happy/excited
     if (state.name === 'happy' || state.name === 'excited') {
-      this.drawBlush(t, offsetX, offsetY);
+      this.drawBlush(t, posX, posY);
     }
     
     // Draw sparkles if excited
     if (eyes.sparkle) {
-      this.drawSparkles(t, offsetX, offsetY);
+      this.drawSparkles(t, posX, posY);
     }
   }
   
@@ -212,9 +228,9 @@ export class Buddy {
     
     if (effectiveOpenness > 0.3) {
       // Draw eye with parentheses border
-      this.drawChar(t, '(', x - 1, y);
-      this.drawChar(t, eyeChar, x, y);
-      this.drawChar(t, ')', x + 1, y);
+      this.drawCharAt(t, '(', x - 1, y);
+      this.drawCharAt(t, eyeChar, x, y);
+      this.drawCharAt(t, ')', x + 1, y);
       
       // Draw pupil inside if eye is open enough
       if (effectiveOpenness > 0.5) {
@@ -222,11 +238,11 @@ export class Buddy {
         const pupilOffsetY = Math.round(lookY * 0.3);
         
         t.charColor(60, 30, 15); // Dark amber for pupil
-        this.drawChar(t, sparkle ? FACE_CHARS.sparkle : FACE_CHARS.pupil, x + pupilOffsetX, y + pupilOffsetY);
+        this.drawCharAt(t, sparkle ? FACE_CHARS.sparkle : FACE_CHARS.pupil, x + pupilOffsetX, y + pupilOffsetY);
       }
     } else {
       // Simple closed eye
-      this.drawChar(t, eyeChar, x, y);
+      this.drawCharAt(t, eyeChar, x, y);
     }
   }
   
@@ -251,9 +267,9 @@ export class Buddy {
     }
     
     // Draw mouth (3 characters wide)
-    this.drawChar(t, mouthChars[0], x - 1 + offsetX, y);
-    this.drawChar(t, mouthChars[1], x + offsetX, y);
-    this.drawChar(t, mouthChars[2], x + 1 + offsetX, y);
+    this.drawCharAt(t, mouthChars[0], x - 1 + offsetX, y);
+    this.drawCharAt(t, mouthChars[1], x + offsetX, y);
+    this.drawCharAt(t, mouthChars[2], x + 1 + offsetX, y);
   }
   
   drawBlush(t, centerX, centerY) {
@@ -261,10 +277,10 @@ export class Buddy {
     t.charColor(255, 120, 60, blushAlpha); // Warmer blush
     
     // Left blush
-    this.drawChar(t, FACE_CHARS.blush, centerX - 7, centerY);
+    this.drawCharAt(t, FACE_CHARS.blush, centerX - 7, centerY);
     
     // Right blush
-    this.drawChar(t, FACE_CHARS.blush, centerX + 7, centerY);
+    this.drawCharAt(t, FACE_CHARS.blush, centerX + 7, centerY);
   }
   
   drawSparkles(t, centerX, centerY) {
@@ -276,7 +292,7 @@ export class Buddy {
       const visible = Math.sin(this.time * 8 + i * 1.5) > 0;
       if (visible) {
         t.charColor(255, 220, 150); // Warm sparkle
-        this.drawChar(t, FACE_CHARS.sparkle, centerX + dx, centerY + dy);
+        this.drawCharAt(t, FACE_CHARS.sparkle, centerX + dx, centerY + dy);
       }
     });
   }
