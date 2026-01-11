@@ -33,7 +33,7 @@ const FACE = {
 const DEFAULT_STATE = 'awake';
 
 export class Buddy {
-  static SLEEP_TIMEOUT = 120;
+  static SLEEP_TIMEOUT = 45;
   
   constructor(t) {
     this.t = t;
