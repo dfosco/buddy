@@ -30,7 +30,7 @@ const FACE = {
 };
 
 // Default state: 'awake', 'sleeping', 'sparkle'
-const DEFAULT_STATE = 'sparkle';
+const DEFAULT_STATE = 'awake';
 
 export class Buddy {
   static SLEEP_TIMEOUT = 120;
