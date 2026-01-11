@@ -69,6 +69,7 @@ else
         --no-first-run \
         --disable-default-apps \
         --disable-translate \
+        --force-prefers-no-reduced-motion \
         --disable-background-networking \
         --disable-infobars \
         --autoplay-policy=no-user-gesture-required \

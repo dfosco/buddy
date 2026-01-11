@@ -9,6 +9,11 @@ html, body {
   height: 100%;
   overflow: hidden;
   background: var(--bg-color, #190c05);
+  cursor: url('/cursor.svg'), auto;
+}
+
+html:active, body:active {
+  cursor: url('/cursor-click.svg'), auto;
 }
 
 body::before {

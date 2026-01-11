@@ -21,6 +21,23 @@ export const BG_COLOR = hslToRgb(HUE, 70, 6);
 document.documentElement.style.setProperty('--char-color', `rgb(${CHAR_COLOR.join(',')})`);
 document.documentElement.style.setProperty('--bg-color', `rgb(${BG_COLOR.join(',')})`);
 
+// Update cursor colors
+const CURSOR_COLOR = hslToRgb(HUE, 80, 70);
+const cursorRgb = `rgb(${CURSOR_COLOR.join(',')})`;
+
+// Create data URLs for cursors with the correct color
+const createCursorSVG = (size) => {
+  const svg = `<svg width="${size}px" height="${size}px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" opacity="0.8"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.5027 9.96958C20.7073 10.4588 20.6154 12.1941 19.3658 12.5533L13.0605 14.3658L10.1807 20.2606C9.60996 21.4288 7.88499 21.218 7.6124 19.9468L4.67677 6.25646C4.44638 5.18204 5.5121 4.2878 6.53019 4.70126L19.5027 9.96958Z" fill="${cursorRgb}" stroke="#000000" stroke-width="1.5"></path></svg>`;
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
+};
+
+const cursorStyle = document.createElement('style');
+cursorStyle.textContent = `
+  html, body { cursor: url('${createCursorSVG(48)}') 8 8, auto !important; }
+  html:active, body:active { cursor: url('${createCursorSVG(44)}') 8 8, auto !important; }
+`;
+document.head.appendChild(cursorStyle);
+
 const FACE = {
   eyeOpen: ['(', '●', ')'],
   eyeSparkle: ['(', '-', ')'],
@@ -65,6 +82,14 @@ export class Buddy {
     window.addEventListener('mousemove', resetActivity);
     window.addEventListener('mousedown', resetActivity);
     window.addEventListener('keydown', resetActivity);
+    
+    // Double-click to trigger sparkle mode
+    window.addEventListener('dblclick', () => {
+      const now = Date.now();
+      this.isSparkle = true;
+      this.lastStateChange = now;
+      this.nextStateChange = 3000; // Sparkle for 3 seconds
+    });
   }
   
   update() {
@@ -91,7 +116,8 @@ export class Buddy {
     if (!this.isSleeping && (now - this.lastStateChange) > this.nextStateChange) {
       this.isSparkle = !this.isSparkle;
       this.lastStateChange = now;
-      this.nextStateChange = this.getRandomInterval();
+      // Sparkle lasts 3 seconds, then wait 45-60 seconds before next sparkle
+      this.nextStateChange = this.isSparkle ? 3000 : this.getRandomInterval();
     }
     
     // Zzz animation phase
