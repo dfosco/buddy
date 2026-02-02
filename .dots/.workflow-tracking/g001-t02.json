@@ -1,0 +1,15 @@
+{
+  "task_ref": "#g001#t02",
+  "goal_id": "g001",
+  "task_id": "t02",
+  "current_phase": "PREPARE",
+  "completed_phases": [
+    "HOOK_CLAIM",
+    "CONFIG",
+    "REFRESH_PRE",
+    "WORK_MODE",
+    "PREPARE"
+  ],
+  "started_at": "2026-02-02T12:50:29.929Z",
+  "last_updated": "2026-02-02T12:50:31.021Z"
+}

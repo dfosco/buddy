@@ -1,0 +1,18 @@
+{
+  "default_branch": "main",
+  "merge_mode": "merge",
+  "auto_done_goal": false,
+  "username": "dfosco",
+  "collaboration": true,
+  "view": {
+    "hide_goal_statuses": [
+      "archived"
+    ],
+    "hide_task_statuses": [
+      "archived"
+    ],
+    "hide_tasks_for_goal_statuses": [
+      "closed"
+    ]
+  }
+}
