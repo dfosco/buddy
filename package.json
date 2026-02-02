@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "kiosk": "./launch-kiosk.sh",
     "electron": "electron .",
-    "electron:dev": "NODE_ENV=development electron ."
+    "electron:dev": "NODE_ENV=development electron .",
+    "app": "npm run build && electron ."
   },
   "devDependencies": {
     "electron": "^40.1.0",
