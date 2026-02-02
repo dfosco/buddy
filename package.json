@@ -8,7 +8,6 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "kiosk": "./launch-kiosk.sh",
     "electron": "electron .",
     "electron:dev": "NODE_ENV=development electron .",
     "app": "npm run build && electron ."

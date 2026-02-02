@@ -11,7 +11,7 @@ Buddy is an animated character designed to serve as a living background for an e
 ## Technical Stack
 - **Framework**: Vite (vanilla JavaScript)
 - **Graphics**: Paper.js for vector-based animations
-- **Deployment**: Local development server with Chrome kiosk mode launcher
+- **Deployment**: Electron application for local kiosk mode
 
 ## Features
 
@@ -70,16 +70,15 @@ buddy/
 │   └── animations.js   # Animation utilities
 ├── public/
 ├── style.css           # Minimal styling
-├── launch-kiosk.sh     # Chrome kiosk launcher script
+├── electron/           # Electron main process
 └── PRD.md              # This document
 ```
 
 ## Kiosk Mode
-A shell script (`launch-kiosk.sh`) will:
-1. Start the Vite dev server
-2. Wait for server to be ready
-3. Launch Chrome in kiosk/app mode pointing to localhost
-4. Provide instructions for fullscreen toggle
+Buddy runs as an Electron application that:
+1. Packages the web app locally (no external server needed)
+2. Provides native kiosk mode via `npm run app`
+3. Supports development mode via `npm run electron:dev`
 
 ## Success Criteria
 - [x] Smooth 60fps animations
