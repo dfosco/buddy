@@ -5,3 +5,5 @@
 {"event":"task_created","goal_id":"g001","task_id":"t04","timestamp":"2026-02-02T12:23:41.907Z","title":"Add npm scripts for app mode","description":"Add npm run app script that builds and launches Electron app"}
 {"event":"task_created","goal_id":"g001","task_id":"t05","timestamp":"2026-02-02T12:23:41.938Z","title":"Remove launch-kiosk.sh and clean up Chrome data directory","description":"Delete the shell script and .buddy-chrome-data references, update README if needed"}
 {"event":"status_changed","goal_id":"g001","timestamp":"2026-02-02T12:23:49.533Z","status":"to_do"}
+{"event":"task_status_changed","goal_id":"g001","task_id":"t01","timestamp":"2026-02-02T12:49:04.272Z","status":"in_progress"}
+{"event":"task_status_changed","goal_id":"g001","task_id":"t01","timestamp":"2026-02-02T12:50:23.081Z","status":"done"}
