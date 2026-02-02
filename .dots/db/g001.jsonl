@@ -9,3 +9,6 @@
 {"event":"task_status_changed","goal_id":"g001","task_id":"t01","timestamp":"2026-02-02T12:50:23.081Z","status":"done"}
 {"event":"task_status_changed","goal_id":"g001","task_id":"t02","timestamp":"2026-02-02T12:50:30.863Z","status":"in_progress"}
 {"event":"task_status_changed","goal_id":"g001","task_id":"t02","timestamp":"2026-02-02T12:52:13.045Z","status":"done"}
+{"event":"task_status_changed","goal_id":"g001","task_id":"t03","timestamp":"2026-02-02T12:52:20.496Z","status":"in_progress"}
+{"event":"task_status_changed","goal_id":"g001","task_id":"t03","timestamp":"2026-02-02T12:52:59.024Z","status":"done"}
+{"event":"task_status_changed","goal_id":"g001","task_id":"t03","timestamp":"2026-02-02T12:53:12.514Z","status":"done"}
