@@ -1,13 +1,18 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
+
+// Disable menu bar completely for app-like appearance
+Menu.setApplicationMenu(null);
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 1024,
-    height: 768,
+    width: 1920,
+    height: 1080,
+    frame: false,
     kiosk: true,
     fullscreen: true,
     autoHideMenuBar: true,
+    backgroundColor: '#000000',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true
