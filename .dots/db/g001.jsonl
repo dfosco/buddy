@@ -7,3 +7,5 @@
 {"event":"status_changed","goal_id":"g001","timestamp":"2026-02-02T12:23:49.533Z","status":"to_do"}
 {"event":"task_status_changed","goal_id":"g001","task_id":"t01","timestamp":"2026-02-02T12:49:04.272Z","status":"in_progress"}
 {"event":"task_status_changed","goal_id":"g001","task_id":"t01","timestamp":"2026-02-02T12:50:23.081Z","status":"done"}
+{"event":"task_status_changed","goal_id":"g001","task_id":"t02","timestamp":"2026-02-02T12:50:30.863Z","status":"in_progress"}
+{"event":"task_status_changed","goal_id":"g001","task_id":"t02","timestamp":"2026-02-02T12:52:13.045Z","status":"done"}
