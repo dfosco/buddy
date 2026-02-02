@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/buddy/',
+  // Use relative paths for Electron file:// protocol
+  base: './',
 });
