@@ -76,4 +76,4 @@ else
         2>/dev/null &
 fi
 
-echo -e "${GREEN}Buddy launched!${NC}"
+echo -e "👾 Buddy launched!"
