@@ -1,17 +1,15 @@
 # Buddy
 
-Buddy is a little guy you can keep running while you work to keep you company. Looks great on one of those retro monitors.
+Buddy is a little guy™ on a website you can leave open to keep you company. Looks great on one of those tiny retro monitors.
 
 https://dfosco.github.io/buddy
 
-Falls asleep often, click to wake.
+Falls asleep often, click to wake. Refresh to change color. Double click for a treat.
 
 ||||
 |---|---|---|
 |![](.readme/buddy.png)|![](.readme/buddy-2.png)|![](.readme/buddy-3.png)|
 
-
----
 
 ### Development
 
