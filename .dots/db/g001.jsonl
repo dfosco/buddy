@@ -16,4 +16,3 @@
 {"event":"task_status_changed","goal_id":"g001","task_id":"t04","timestamp":"2026-02-02T12:53:52.766Z","status":"done"}
 {"event":"task_status_changed","goal_id":"g001","task_id":"t05","timestamp":"2026-02-02T12:53:59.581Z","status":"in_progress"}
 {"event":"task_status_changed","goal_id":"g001","task_id":"t05","timestamp":"2026-02-02T12:54:43.574Z","status":"done"}
-{"event":"task_status_changed","goal_id":"g001","task_id":"t05","timestamp":"2026-02-02T12:57:47.741Z","status":"done"}

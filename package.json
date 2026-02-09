@@ -10,8 +10,7 @@
     "preview": "vite preview",
     "electron": "electron .",
     "electron:dev": "NODE_ENV=development electron .",
-    "app": "npm run build && electron .",
-    "create-shortcut": "node scripts/create-shortcut.mjs"
+    "app": "npm run build && electron ."
   },
   "devDependencies": {
     "electron": "^40.1.0",
