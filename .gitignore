@@ -23,5 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
+<<<<<<< HEAD
 # dots worktrees
 .worktrees/
+=======
+.buddy-chrome-data
+>>>>>>> parent of bfdcaf8 (#g001#t05: Remove launch-kiosk.sh and clean up Chrome data directory)
